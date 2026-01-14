@@ -1,0 +1,66 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model AmazonDatumr {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  isAdmin   Boolean?
+  orders    Order[]
+  reviews   Review?
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  category        Category[]
+  colors          Json
+  createdAt       DateTime   @default(now())
+  description     Json
+  discountedPrice Float
+  id              String     @id @default(cuid())
+  images          Json
+  order           Order?     @relation(fields: [orderId], references: [id])
+  orderId         String?
+  reviews         Review[]
+  title           String
+  titlePrice      Float
+  updatedAt       DateTime   @updatedAt
+  variance        Json
+}
+
+model Category {
+  createdAt DateTime  @default(now())
+  id        String    @id @default(cuid())
+  name      String
+  products  Product[]
+  updatedAt DateTime  @updatedAt
+}
+
+model Review {
+  createdAt DateTime      @default(now())
+  id        String        @id @default(cuid())
+  product   Product?      @relation(fields: [productId], references: [id])
+  productId String?
+  rating    Int?
+  updatedAt DateTime      @updatedAt
+  user      AmazonDatumr? @relation(fields: [userId], references: [id])
+  userId    String?       @unique
+}
+
+model Order {
+  createdAt     DateTime      @default(now())
+  id            String        @id @default(cuid())
+  payment       String?
+  paymentStatus Boolean?
+  price         Float?
+  products      Product[]
+  status        Json?
+  updatedAt     DateTime      @updatedAt
+  user          AmazonDatumr? @relation(fields: [userId], references: [id])
+  userId        String?
+}
